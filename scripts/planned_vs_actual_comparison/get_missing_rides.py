@@ -79,23 +79,25 @@ class RideStatisticsOutput:
         self.date = date
         self.missing_planned_rides_count = get_missing_rides(self.rides)
         self.missing_percentage = int((self.missing_planned_rides_count / self.planned_rides_count) * 100)
+        self.extra_executed_rides_count = get_extra_rides(self.rides)
 
     def to_dict(self):
-        dict = self.__dict__
+        dict = {"rides_executed_count": self.executed_rides_count,
+                "rides_planned_count": self.planned_rides_count}
         self.rides.sort()
-        dict["rides"] = [child.__dict__ for child in dict["rides"]]
+        dict["rides"] = [child.__dict__ for child in self.rides]
         return dict
 
     @classmethod
     def csv_format(cls):
-        return "route_name", "long_name", "operator", "direction", "full_date", "month", "day_of_the_week", "planned_rides_count", "executed_rides_count", "missing_planned_rides_count", "missing_percentage"
+        return "route_name", "long_name", "operator", "direction", "full_date", "month", "day_of_the_week", "planned_rides_count", "executed_rides_count", "extra_executed_rides", "missing_planned_rides_count", "missing_percentage"
 
     # Use to create a csv line
     def to_csv_line(self):
         # route_name, long_name, operator, direction, full_date, month, day_of_the_week, planned_rides_count, executed_rides_count, missing_planned_rides_count
         return self.route.short_name, self.route.long_name, self.route.operator, self.route.direction, \
                self.date, self.date.month, self.date.strftime("%A"), \
-               self.planned_rides_count, self.executed_rides_count, self.missing_planned_rides_count, self.missing_percentage
+               self.planned_rides_count, self.executed_rides_count, self.extra_executed_rides_count, self.missing_planned_rides_count, self.missing_percentage
 
     def __str__(self):
         output = f'Planned and actual rides of {self.route.short_name} at {self.date}\n'
@@ -257,6 +259,9 @@ def compare_daily_schedules_actual_and_planned(gtfs_times: list[RideDetails], si
 def get_missing_rides(daily_rides: list[Ride]) -> int:
     return len([ride for ride in daily_rides if ride.gtfs_time is not None and ride.siri_time is None])
 
+def get_extra_rides(daily_rides: list[Ride]) -> int:
+    return len([ride for ride in daily_rides if ride.siri_time is not None and ride.gtfs_time is None])
+
 
 def before_4(x: str):
     # x is '00:00' or 01:00'
@@ -334,31 +339,3 @@ def find_gtfs_and_siri_for_date(the_date, operator_ref, line_ref, debug: bool = 
                                       compared_rides)
     print(statistics)
     return statistics
-
-
-def find_gtfs_and_siri_for_all_kavim(debug: bool = False):
-    day_from = 1
-    day_to = 26
-    DIRECTION_0 = 0
-    DIRECTION_1 = 1
-    for kav_num in range(615, 621):
-        find_gtfs_and_siri_for_dates("2022-12-", str(kav_num), DIRECTION_0, day_from, day_to, debug)
-        find_gtfs_and_siri_for_dates("2022-12-", str(kav_num), DIRECTION_1, day_from, day_to, debug)
-
-
-def main1():
-    debug : bool = False
-    find_gtfs_and_siri_for_dates("2022-12-", "615", 0, 22, 22, debug)
-    # find_gtfs_and_siri_for_dates("2022-12-", "470", 1, 12, 13, debug)
-
-
-def main():
-    debug : bool = False
-    find_gtfs_and_siri_for_all_kavim(debug)
-
-
-if __name__ == '__main__':
-    main()
-    # s = '2022-12-11T04:00:00+02:00'
-    # d = dt.strptime(s, "%Y-%m-%dT%H:%M:%S%z")
-    # print(d.astimezone(tz.utc))
