@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
         {
-            "src": "./app.py",
+            "src": "open-bus-stride-client/scripts/planned_vs_actual_comparison/app.py",
             "use": "@vercel/python"
         }
     ],
