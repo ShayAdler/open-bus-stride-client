@@ -13,6 +13,6 @@ def get_rides_statistics(line_ref=None, operator_ref=None, date=None):
     return find_gtfs_and_siri_for_date(date, operator_ref, line_ref).to_dict()
 
 if __name__ == '__main__':
-    app.run()
+    app.run("0.0.0.0", 80)
 
 
