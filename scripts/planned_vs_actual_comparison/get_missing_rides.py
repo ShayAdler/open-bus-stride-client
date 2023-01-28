@@ -3,7 +3,6 @@ import csv
 import datetime
 import time
 from datetime import datetime as dt
-from open_bus_stride_api.routers.gtfs_stops import GtfsStopPydanticModel
 import stride
 from stride.common import parse_date_str
 import collections
