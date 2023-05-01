@@ -20,7 +20,9 @@ def get_rides_statistics(line_ref=None, operator_ref=None, date=None):
     if response is None:
         return {}
 
-    return response.to_dict()
+    response = make_response(response.to_dict())
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 @app.route('/get_statistics_csv/<line_refs>/<operator_refs>/<date_from>/<date_to>')
